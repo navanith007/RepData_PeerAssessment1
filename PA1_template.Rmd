@@ -1,25 +1,98 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+First Project On Reproducible Reaserch
+======================================
+
+Loading the activity.csv file
+
+```{r echo = TRUE}
+library(tidyverse)
+activity <- read.csv("activity.csv", header = TRUE, sep = ",")
+summary(activity)
+
+```
+
+calculating the total no of steps taken per day and plotting them using histogram
+
+```{r echo = TRUE}
+activity_byDay <- activity %>% 
+                       group_by(date)%>%
+                       summarise(total_steps = sum(steps))
+
+activity_byDay$date <- as.Date(activity_byDay$date)
+ggplot(activity_byDay, aes(x = date, y = total_steps)) +
+        geom_histogram(stat = "identity")
+```
+
+claculating the mean and median off total no of steps taken per day
+
+```{r echo = TRUE}
+mean(activity_byDay$total_steps, na.rm = TRUE)
+
+median(activity_byDay$total_steps, na.rm = TRUE)
+
+```
+
+```{r echo = TRUE}
+activity_mean <- activity %>%
+        group_by(interval) %>%
+        summarise(mean_steps = mean(steps, na.rm = TRUE))
+```
+
+average steps over time series plot
+
+```{r echo = TRUE}
+ggplot(activity_mean, aes(x = interval, y = mean_steps)) +
+        geom_line()
+```
+calculating no of rows containing in activity data
+```{r echo = TRUE}
+sum(is.na(activity))
+```
+imputing the na vlaues using mean_steps fill in the na containing rows
+```{r echo = TRUE}
+for(i in 1:nrow(activity)){
+        if(is.na(activity$steps[i])){
+                activity$steps[i] = activity_mean$mean_steps[which(activity_mean$interval == activity$interval[i])]
+        }
+}
+sum(is.na(activity$steps))
+```
+after imputing ploting the histogram of total no of steps per day
+```{r echo = TRUE}
+activity$date = as.Date(activity$date)
+ggplot(activity, aes(x = date, y = steps))+
+        geom_histogram(stat = "identity")
+```
+mean and median of the total no of steps per day(after imputing)
+```{r echo = TRUE}
+newActivity_byDay <- activity %>% 
+                       group_by(date)%>%
+                       summarise(total_steps = sum(steps))
+
+mean(newActivity_byDay$total_steps)
+median(newActivity_byDay$total_steps)
+```
+creating new variable containing weekday and weekend
+```{r echo = TRUE}
+activity <- activity %>% mutate(typeofDay = ifelse(weekdays(activity$date) == "Saturday" | weekdays(activity$date) == "Sunday", "weekend", "weekday"))
+table(activity$typeofDay)
+```
+
+```{r echo = TRUE}
+newActivity_mean <- activity %>%
+        group_by(interval, typeofDay) %>%
+        summarise(mean_steps = mean(steps, na.rm = TRUE))
+```
+ploting the avg no of steps taken per each day using panels weekday and weekend
+```{r echo = TRUE}
+ggplot(newActivity_mean, aes(x = interval, y = mean_steps)) +
+        geom_line() +
+        facet_grid(.~typeofDay)
+```
 
 
-## Loading and preprocessing the data
 
 
 
-## What is mean total number of steps taken per day?
 
 
 
-## What is the average daily activity pattern?
-
-
-
-## Imputing missing values
-
-
-
-## Are there differences in activity patterns between weekdays and weekends?
