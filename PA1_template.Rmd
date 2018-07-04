@@ -86,7 +86,7 @@ ploting the avg no of steps taken per each day using panels weekday and weekend
 ```{r echo = TRUE}
 ggplot(newActivity_mean, aes(x = interval, y = mean_steps)) +
         geom_line() +
-        facet_grid(.~typeofDay)
+        facet_grid(typeofDay~.)
 ```
 
 
