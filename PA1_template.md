@@ -1,7 +1,7 @@
 First Project On Reproducible Reaserch
 ======================================
 
-Loading the activity.csv file
+Loading the activity.csv file knitr::knit("PA1\_template.Rmd")
 
 ``` r
 library(tidyverse)
@@ -21,6 +21,7 @@ library(tidyverse)
     ## x dplyr::lag()    masks stats::lag()
 
 ``` r
+knitr::opts_chunk$set(echo = TRUE)
 activity <- read.csv("activity.csv", header = TRUE, sep = ",")
 summary(activity)
 ```
@@ -42,11 +43,15 @@ activity_byDay <- activity %>%
                        summarise(total_steps = sum(steps))
 
 activity_byDay$date <- as.Date(activity_byDay$date)
-ggplot(activity_byDay, aes(x = date, y = total_steps)) +
+g <- ggplot(activity_byDay, aes(x = date, y = total_steps)) +
         geom_histogram(stat = "identity")
 ```
 
     ## Warning: Ignoring unknown parameters: binwidth, bins, pad
+
+``` r
+print(g)
+```
 
     ## Warning: Removed 8 rows containing missing values (position_stack).
 
